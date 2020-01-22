@@ -1,30 +1,29 @@
 import numpy as np
 import random
 
+
 class Board:
 
     def __init__(self):
-        self.state = np.zeros((3,3))
+        self.state = np.zeros((3, 3))
         self.turn = 'x'
         self.moves = 0
-
 
     def reset(self):
-        self.state = np.zeros((3,3))
+        self.state = np.zeros((3, 3))
         self.turn = 'x'
         self.moves = 0
 
-
-    def addToken(self, one:int, two:int):
+    def addToken(self, one: int, two: int):
 
         try:
-            if self.state[one,two] == 0:
+            if self.state[one, two] == 0:
 
                 if self.turn == 'x':
-                    self.state[one,two] += 1
+                    self.state[one, two] += 1
 
                 elif self.turn == 'o':
-                    self.state[one,two] += 2
+                    self.state[one, two] += 2
 
             else:
                 return "bad"
@@ -34,7 +33,7 @@ class Board:
 
     def niceBoard(self):
 
-        board = [[],[],[]]
+        board = [[], [], []]
         state = self.state.tolist()
 
         for i in range(len(state)):
@@ -53,7 +52,6 @@ class Board:
 
         return board
 
-
     def winCheck(self):
 
         self.outcome = 'win'
@@ -66,7 +64,7 @@ class Board:
 
         # check vertical
         for i in range(len(self.state)):
-            uniques = np.unique(self.state[:,i])
+            uniques = np.unique(self.state[:, i])
 
             if len(uniques) == 1 and uniques[0] != 0:
                 return True
@@ -82,14 +80,12 @@ class Board:
             return False
 
         self.outcome = 'draw'
-        return True # it's tied
-
+        return True  # it's tied
 
     def showBoard(self):
 
         for i in self.state:
             print(i)
-
 
     def next(self):
 
@@ -99,39 +95,35 @@ class Board:
         else:
             self.turn = 'x'
 
-
     def getMoves(self):
 
         self.moves = np.where(self.state == 0)
         moves = []
 
         for i in range(len(self.moves[0])):
-            moves.append((self.moves[0][i],self.moves[1][i]))
+            moves.append((self.moves[0][i], self.moves[1][i]))
 
         return moves
 
-
-    def move(self,one,two):
+    def move(self, one, two):
 
         if self.turn == 'x':
-            place = (one,two)
+            place = (one, two)
             return place
 
         else:
             moves = self.getMoves()
-            move = moves[random.randint(0,len(moves)-1)]
+            move = moves[random.randint(0, len(moves)-1)]
             return move
-
 
     def randoMove(self):
         moves = self.getMoves()
-        move = moves[random.randint(0,len(moves)-1)]
-        self.addToken(move[0],move[1])
-
+        move = moves[random.randint(0, len(moves)-1)]
+        self.addToken(move[0], move[1])
 
     def getMessage(self):
 
-        if self.winCheck() == True:
+        if self.winCheck():
 
             if self.outcome == 'win':
                 message = f"{self.turn} has won"
@@ -151,7 +143,7 @@ class Train(Board):
     def __init__(self):
         Board.__init__(self)
         self.stable = []
-        self.qtable = np.zeros((10000,9))
+        self.qtable = np.zeros((10000, 9))
         self.alpha = 0.1
         self.discount = 0.9
         self.epsilon = 1
@@ -160,13 +152,11 @@ class Train(Board):
         self.epsilon_decay = -0.0005
         self.episodes = 50000
 
-
     def randomMove(self):
 
         moves = self.getMoves()
-        move = moves[random.randint(0,len(moves)-1)]
+        move = moves[random.randint(0, len(moves)-1)]
         return move
-
 
     def getMove(self):
 
@@ -177,7 +167,7 @@ class Train(Board):
                 move = self.randomMove()
 
             else:
-                move = np.unravel_index(np.argmax(self.qtable[i]),(3,3))
+                move = np.unravel_index(np.argmax(self.qtable[i]), (3, 3))
 
             return self.state.tolist(), move
 
@@ -185,7 +175,6 @@ class Train(Board):
             self.stable.append(self.state.tolist())
             move = self.randomMove()
             return self.state.tolist(), move
-
 
     def getReward(self):
 
@@ -201,12 +190,11 @@ class Train(Board):
             self.losses += 1
             return -1
 
-
     def agentMove(self):
 
         if self.state.tolist() in self.stable:
             i = self.stable.index(self.state.tolist())
-            move = np.unravel_index(np.argmax(self.qtable[i]),(3,3))
+            move = np.unravel_index(np.argmax(self.qtable[i]), (3, 3))
 
             if np.amax(self.qtable[i]) == 0:
                 move = self.randoMove()
@@ -217,11 +205,10 @@ class Train(Board):
         else:
             move = self.randoMove()
 
-
     def start(self):
 
         self.stable = []
-        self.qtable = np.zeros((10000,9))
+        self.qtable = np.zeros((10000, 9))
         self.wins = 0
         self.losses = 0
         self.draws = 0
@@ -233,7 +220,7 @@ class Train(Board):
             self.reset()
             done = False
 
-            while done == False:
+            while not done:
 
                 # agent starts first (turn = 1)
                 ethreshold = random.uniform(0, 1)
@@ -250,7 +237,7 @@ class Train(Board):
                 self.addToken(move[0], move[1])
 
                 # get reward
-                if self.winCheck() == True:
+                if self.winCheck():
                     reward = self.getReward()
                     self.total += reward
                     done = True
@@ -261,7 +248,7 @@ class Train(Board):
                     self.next()
                     self.randoMove()
 
-                    if self.winCheck() == True:
+                    if self.winCheck():
                         reward = self.getReward()
                         self.total += reward
                         done = True
@@ -276,27 +263,20 @@ class Train(Board):
                 index = self.stable.index(state)
                 new_index = self.stable.index(self.state.tolist())
                 # convert move tuple into single index
-                move = np.ravel_multi_index(move,(3,3))
+                move = np.ravel_multi_index(move, (3, 3))
                 # update q-table
-                self.qtable[index][move] = self.qtable[index][move] + self.alpha * (reward + self.discount * np.max(self.qtable[new_index]) - self.qtable[index][move])
+                self.qtable[index][move] = self.qtable[index][move] + self.alpha * (
+                    reward + self.discount * np.max(self.qtable[new_index]) - self.qtable[index][move])
 
-            self.epsilon = self.min_epsilon + (self.max_epsilon - self.min_epsilon) * np.exp(self.epsilon_decay * episode)
-"""
-            if episode % session == 0 and episode != 0:
+            self.epsilon = self.min_epsilon + \
+                (self.max_epsilon - self.min_epsilon) * \
+                np.exp(self.epsilon_decay * episode)
 
-                print(f"wins: {self.wins} losses: {self.losses} draws: {self.draws} in {session} games - lose %: {(self.losses/session)*100}")
-                self.wins = 0
-                self.losses = 0
-                self.draws = 0
-
-        print(f"wins: {self.wins} losses: {self.losses} draws: {self.draws} in {session} games - lose %: {(self.losses/session)*100}")
-"""
 
 def main():
 
     t = Train()
     t.start()
-
 
 
 if __name__ == "__main__":
