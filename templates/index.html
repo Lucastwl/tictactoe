@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="">
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stile.css') }}">
+    <title></title>
+  </head>
+  <body>
+    <button class="thing" type="button" data-move="0"> <span id="0"> {{ board[0][0] }} </span> </button>
+    <button class="thing" type="button" data-move="1"> <span id="1"> {{ board[0][1] }} </span> </button>
+    <button class="thing" type="button" data-move="2"> <span id="2"> {{ board[0][2] }} </span> </button><br>
+
+    <button class="thing" type="button" data-move="3"> <span id="3"> {{ board[1][0] }} </span> </button>
+    <button class="thing" type="button" data-move="4"> <span id="4"> {{ board[1][1] }} </span> </button>
+    <button class="thing" type="button" data-move="5"> <span id="5"> {{ board[1][2] }} </span></button><br>
+
+    <button class="thing" type="button" data-move="6"> <span id="6"> {{ board[2][0] }} </span></button>
+    <button class="thing" type="button" data-move="7"> <span id="7"> {{ board[2][1] }} </span></button>
+    <button class="thing" type="button" data-move="8"> <span id="8"> {{ board[2][2] }} </span></button><br>
+
+    <div><span id="message"></span></div>
+
+    <button type="button" id="start" name="button">Start</button>
+
+    <form action="{{ url_for('reset') }}" method="post">
+      <button name="button">Reset</button>
+    </form><br>
+
+    <div class="slidecontainer">
+      Number of Episodes <br>
+      <input type="range" min="0" max="1000000" value=0 class="slider" id="range"><br>
+      <input type="text" id="number"></input>
+    </div>
+
+    <form action="{{ url_for('train') }}" method="post">
+      <button id="train">Train</button>
+    </form>
+
+  </body>
+</html>

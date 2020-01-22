@@ -1,0 +1,28 @@
+#number{
+  font-size: 15px;
+}
+
+body{
+  font-size: 20px;
+  font-family: sans-serif;
+}
+
+.thing{
+  height: 17vh;
+  width: 10vw;
+  border-radius: 4px;
+  margin: 0.5%;
+  font-size: 2vw;
+}
+
+.thing:hover:enabled {
+  background-color: Grey;
+}
+
+.slider{
+  opacity: 0.7
+}
+
+.slider:hover {
+  opacity: 1;
+}
