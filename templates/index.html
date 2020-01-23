@@ -5,8 +5,8 @@
     <link rel="shortcut icon" href="">
     <script src="{{ url_for('static', filename='index.js') }}"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stile.css') }}">
-    <title></title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>TicTacToe</title>
   </head>
   <body>
     <button class="thing" type="button" data-move="0"> <span id="0"> {{ board[0][0] }} </span> </button>
@@ -29,15 +29,18 @@
       <button name="button">Reset</button>
     </form><br>
 
-    <div class="slidecontainer">
+    <form action="{{ url_for('train') }}" method="post" id="gotrain">
       Number of Episodes <br>
-      <input type="range" min="0" max="1000000" value=0 class="slider" id="range"><br>
-      <input type="text" id="number"></input>
-    </div>
-
-    <form action="{{ url_for('train') }}" method="post">
+      <input type="range" min="0" max="1000000" value=0 class="slider" id="range" name="range"><br>
+      <input type="text" id="number" autocomplete="off"></input><br>
       <button id="train">Train</button>
     </form>
+
+    {% if episodes != 0 %}
+      Trained for {{ episodes }} episodes
+    {% endif %}
+    <span id="value"></span>
+
 
   </body>
 </html>

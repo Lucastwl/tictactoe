@@ -6,30 +6,35 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 bored = Train()
+episodes = 0
 
 @app.route("/")
 def index():
 
     board = bored.niceBoard()
 
-    return render_template("index.html",board=board)
+    return render_template("index.html",board=board, episodes=episodes)
 
 @app.route("/reset",methods=["POST"])
 def reset():
 
     bored.reset()
 
-    return redirect(url_for('index'))
+    return redirect(url_for('index',episodes=episodes))
 
 
 @app.route("/train",methods=["POST"])
 def train():
 
+    global episodes
     bored.reset()
-    bored.start()
+    number = request.form.get("range")
+    bored.start(int(number))
     bored.reset()
+    episodes = int(number)
 
-    return redirect(url_for('index'))
+    return redirect(url_for('index', episodes=episodes))
+
 
 @socketio.on("start")
 def start():
@@ -40,7 +45,6 @@ def start():
     bored.next()
 
     emit("new state", (board, message))
-
 
 
 @socketio.on("input move")
