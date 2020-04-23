@@ -9,10 +9,12 @@ class Board:
         self.turn = 'x'
         self.moves = 0
 
+
     def reset(self):
         self.state = np.zeros((3, 3))
         self.turn = 'x'
         self.moves = 0
+
 
     def addToken(self, one: int, two: int):
 
@@ -31,26 +33,6 @@ class Board:
         except ValueError:
             raise "invalid input"
 
-    def niceBoard(self):
-
-        board = [[], [], []]
-        state = self.state.tolist()
-
-        for i in range(len(state)):
-            line = state[i]
-
-            for j in range(len(line)):
-
-                if line[j] == 0:
-                    board[i].append(' - ')
-
-                elif line[j] == 1:
-                    board[i].append('x')
-
-                elif line[j] == 2:
-                    board[i].append('o')
-
-        return board
 
     def winCheck(self):
 
@@ -82,10 +64,12 @@ class Board:
         self.outcome = 'draw'
         return True  # it's tied
 
+
     def showBoard(self):
 
         for i in self.state:
             print(i)
+
 
     def next(self):
 
@@ -95,15 +79,6 @@ class Board:
         else:
             self.turn = 'x'
 
-    def getMoves(self):
-
-        self.moves = np.where(self.state == 0)
-        moves = []
-
-        for i in range(len(self.moves[0])):
-            moves.append((self.moves[0][i], self.moves[1][i]))
-
-        return moves
 
     def move(self, one, two):
 
@@ -112,14 +87,20 @@ class Board:
             return place
 
         else:
-            moves = self.getMoves()
-            move = moves[random.randint(0, len(moves)-1)]
-            return move
+            return self.randoMove()
+
 
     def randoMove(self):
-        moves = self.getMoves()
+
+        self.moves = np.where(self.state == 0)
+        moves = []
+
+        for i in range(len(self.moves[0])):
+            moves.append((self.moves[0][i], self.moves[1][i]))
+
         move = moves[random.randint(0, len(moves)-1)]
-        self.addToken(move[0], move[1])
+        return move
+
 
     def getMessage(self):
 
@@ -138,6 +119,28 @@ class Board:
             return False, message
 
 
+    def niceBoard(self):
+
+        board = [[], [], []]
+        state = self.state.tolist()
+
+        for i in range(len(state)):
+            line = state[i]
+
+            for j in range(len(line)):
+
+                if line[j] == 0:
+                    board[i].append(' - ')
+
+                elif line[j] == 1:
+                    board[i].append('x')
+
+                elif line[j] == 2:
+                    board[i].append('o')
+
+        return board
+
+
 class Train(Board):
 
     def __init__(self):
@@ -150,13 +153,18 @@ class Train(Board):
         self.max_epsilon = 1
         self.min_epsilon = 0.01
         self.epsilon_decay = -0.0005
-        self.episodes = 50000
 
-    def randomMove(self):
 
-        moves = self.getMoves()
-        move = moves[random.randint(0, len(moves)-1)]
-        return move
+    def set(self,alpha,discount):
+        self.alpha = alpha
+        self.discount = discount
+
+
+    def takeRando(self):
+
+        moves = self.randoMove()
+        self.addToken(moves[0], moves[1])
+
 
     def getMove(self):
 
@@ -164,7 +172,7 @@ class Train(Board):
             i = self.stable.index(self.state.tolist())
 
             if np.amax(self.qtable[i]) == 0:
-                move = self.randomMove()
+                move = self.randoMove()
 
             else:
                 move = np.unravel_index(np.argmax(self.qtable[i]), (3, 3))
@@ -173,8 +181,9 @@ class Train(Board):
 
         else:
             self.stable.append(self.state.tolist())
-            move = self.randomMove()
+            move = self.randoMove()
             return self.state.tolist(), move
+
 
     def getReward(self):
 
@@ -190,6 +199,7 @@ class Train(Board):
             self.losses += 1
             return -1
 
+
     def agentMove(self):
 
         if self.state.tolist() in self.stable:
@@ -197,15 +207,23 @@ class Train(Board):
             move = np.unravel_index(np.argmax(self.qtable[i]), (3, 3))
 
             if np.amax(self.qtable[i]) == 0:
-                move = self.randoMove()
+                move = self.takeRando()
+                return [0,0,0,0,0,0,0,0,0]
 
             else:
                 self.addToken(move[0], move[1])
 
-        else:
-            move = self.randoMove()
+            tab = self.qtable[i]
+            return np.around(tab,3).tolist()
 
-    def start(self):
+        else:
+            move = self.takeRando()
+            return []
+
+
+
+
+    def start(self, episodes):
 
         self.stable = []
         self.qtable = np.zeros((10000, 9))
@@ -213,7 +231,8 @@ class Train(Board):
         self.losses = 0
         self.draws = 0
         self.total = 0
-        session = 1000
+        self.episodes = episodes
+        session = 1000 # irrelevant
 
         for episode in range(self.episodes):
 
@@ -229,7 +248,7 @@ class Train(Board):
                     state, move = self.getMove()
 
                 else:
-                    move = self.randomMove()
+                    move = self.randoMove()
                     state = self.state.tolist()
                     if state not in self.stable:
                         self.stable.append(state)
@@ -246,7 +265,7 @@ class Train(Board):
                     reward = 0
                     # random opponent's turn
                     self.next()
-                    self.randoMove()
+                    self.takeRando()
 
                     if self.winCheck():
                         reward = self.getReward()
@@ -273,10 +292,20 @@ class Train(Board):
                 np.exp(self.epsilon_decay * episode)
 
 
+            if episode % session == 0 and episode != 0:
+
+                print(f"wins: {self.wins} losses: {self.losses} draws: {self.draws} in {session} games - lose %: {(self.losses/session)*100}")
+                self.wins = 0
+                self.losses = 0
+                self.draws = 0
+
+        print(f"wins: {self.wins} losses: {self.losses} draws: {self.draws} in {session} games - lose %: {(self.losses/session)*100}")
+
+
 def main():
 
     t = Train()
-    t.start()
+    t.start(10000)
 
 
 if __name__ == "__main__":

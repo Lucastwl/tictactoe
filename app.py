@@ -28,12 +28,20 @@ def train():
 
     global episodes
     bored.reset()
-    number = request.form.get("range")
+    number = request.form.get('range')
     bored.start(int(number))
     bored.reset()
     episodes = int(number)
 
     return redirect(url_for('index', episodes=episodes))
+
+
+@socketio.on("change")
+def change(tup):
+
+    bored.set(tup['learn'], tup['disc'])
+    board = bored.niceBoard()
+    emit("new state", (board, "Applied", []))
 
 
 @socketio.on("start")
@@ -44,8 +52,9 @@ def start():
     message = 'cont'
     bored.next()
 
-    emit("new state", (board, message))
+    emit("new state", (board, message, []))
 
+qvalues = []
 
 @socketio.on("input move")
 def input(move):
@@ -60,19 +69,19 @@ def input(move):
     end, message = bored.getMessage()
 
     if end == True:
-        return emit("new state", (board, message))
+        return emit("new state", (board, message, []))
 
     bored.next()
-    bored.agentMove()
+    qvalues = bored.agentMove()
     board = bored.niceBoard()
     end, message = bored.getMessage()
 
     if end == True:
-        return emit("new state", (board, message))
+        return emit("new state", (board, message, qvalues))
 
     bored.next()
 
-    emit("new state", (board, message))
+    emit("new state", (board, message, qvalues))
 
 
 if __name__ == '__main__':

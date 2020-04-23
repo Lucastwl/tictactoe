@@ -9,36 +9,90 @@
     <title>TicTacToe</title>
   </head>
   <body>
-    <button class="thing" type="button" data-move="0"> <span id="0"> {{ board[0][0] }} </span> </button>
-    <button class="thing" type="button" data-move="1"> <span id="1"> {{ board[0][1] }} </span> </button>
-    <button class="thing" type="button" data-move="2"> <span id="2"> {{ board[0][2] }} </span> </button><br>
 
-    <button class="thing" type="button" data-move="3"> <span id="3"> {{ board[1][0] }} </span> </button>
-    <button class="thing" type="button" data-move="4"> <span id="4"> {{ board[1][1] }} </span> </button>
-    <button class="thing" type="button" data-move="5"> <span id="5"> {{ board[1][2] }} </span></button><br>
+    <button class="thing" type="button" data-move="0">
+      <span id="0"> {{ board[0][0] }} </span>
+      <br>
+      <span class="qvals" id="00"></span>
+    </button>
 
-    <button class="thing" type="button" data-move="6"> <span id="6"> {{ board[2][0] }} </span></button>
-    <button class="thing" type="button" data-move="7"> <span id="7"> {{ board[2][1] }} </span></button>
-    <button class="thing" type="button" data-move="8"> <span id="8"> {{ board[2][2] }} </span></button><br>
+    <button class="thing" type="button" data-move="1">
+      <span id="1"> {{ board[0][1] }} </span>
+      <br>
+      <span class="qvals" id="01"></span>
+    </button>
+
+    <button class="thing" type="button" data-move="2">
+      <span id="2"> {{ board[0][2] }} </span>
+      <br>
+      <span class="qvals" id="02"></span>
+    </button><br>
+
+    <button class="thing" type="button" data-move="3">
+      <span id="3"> {{ board[1][0] }} </span>
+      <br>
+      <span class="qvals" id="03"></span>
+    </button>
+
+    <button class="thing" type="button" data-move="4">
+      <span id="4"> {{ board[1][1] }} </span>
+      <br>
+      <span class="qvals" id="04"></span>
+    </button>
+
+    <button class="thing" type="button" data-move="5">
+      <span id="5"> {{ board[1][2] }} </span>
+      <br>
+      <span class="qvals" id="05"></span>
+    </button><br>
+
+    <button class="thing" type="button" data-move="6">
+      <span id="6"> {{ board[2][0] }} </span>
+      <br>
+      <span class="qvals" id="06"></span>
+    </button>
+
+    <button class="thing" type="button" data-move="7">
+      <span id="7"> {{ board[2][1] }} </span>
+      <br>
+      <span class="qvals" id="07"></span>
+    </button>
+
+    <button class="thing" type="button" data-move="8">
+      <span id="8"> {{ board[2][2] }} </span>
+      <br>
+      <span class="qvals" id="08"></span>
+    </button><br>
 
     <div><span id="message"></span></div>
-
     <button type="button" id="start" name="button">Start</button>
+    {% if episodes != 0 %}
+      Trained for {{ episodes }} episodes
+    {% endif %}
 
     <form action="{{ url_for('reset') }}" method="post">
       <button name="button">Reset</button>
     </form><br>
 
     <form action="{{ url_for('train') }}" method="post" id="gotrain">
-      Number of Episodes <br>
-      <input type="range" min="0" max="1000000" value=0 class="slider" id="range" name="range"><br>
-      <input type="text" id="number" autocomplete="off"></input><br>
+      <div>
+          <span class="episodes">Number of Episodes</span> <br>
+          <input type="range" min="0" max="50000" value=0 class="slider" id="range" name="range"><br>
+          <input type="number" id="number" autocomplete="off"></input>
+      </div>
       <button id="train">Train</button>
-    </form>
+    </form><br>
 
-    {% if episodes != 0 %}
-      Trained for {{ episodes }} episodes
-    {% endif %}
+      <div class="names">
+        <span class="names">Learning Rate</span>
+        <input type="number" class="values" id="learning" value="0.1" step="0.1"></input>
+        <br>
+        <span class="names">Discount Rate</span>
+        <input type="number" class="values" id="discount" value="0.9" step="0.1"></input><br>
+
+        <button id="mybutton">Apply</button>
+      </div>
+
     <span id="value"></span>
 
 

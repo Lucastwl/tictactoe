@@ -2,7 +2,18 @@
   font-size: 15px;
 }
 
-body{
+.names{
+  font-size: 10pt;
+  font-family: sans-serif;
+}
+
+.qvals{
+  font-size: 5pt;
+  font-family: times;
+}
+
+
+.episodes{
   font-size: 20px;
   font-family: sans-serif;
 }
