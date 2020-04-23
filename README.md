@@ -1,2 +1,2 @@
 # tictactoe
-just run python app.py, not flask run
+just run app.py on the terminal, not flask run
